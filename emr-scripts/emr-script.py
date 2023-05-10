@@ -12,7 +12,6 @@ import datetime
 import numpy as np
 import string, re
 import argparse
-from pathlib import Path
 import os
 
 from statsmodels.tsa.seasonal import seasonal_decompose
@@ -25,12 +24,11 @@ class CustomTokenizer(Tokenizer):
         def remove_punctuation_and_tokenize(text):
             if text is None:
               return []
-            # Remove punctuation
+
             cleaned_text = text.lower().translate(str.maketrans('', '', string.punctuation))
             # cleaned_text = cleaned_text.translate(str.maketrans('', '', string.digits))
             cleaned_text = re.sub(f"[{non_space_whitespace}]", " ", cleaned_text)
             
-            # Tokenize (split by whitespace)
             tokens = cleaned_text.split()
             
             return tokens
@@ -108,25 +106,6 @@ def main():
                             .parquet(f"{args.s3_source_path}/submissions_3/") \
                             .sample(args.sample_size)
     
-
-    # comments_df = (spark.read
-    #     .option("multiline", "true")
-    #     .option("quote", '"')
-    #     .option("header", "true")
-    #     .option("escape", "\\")
-    #     .option("escape", '"')
-    #     .csv("/content/drive/MyDrive/proj/uwaterloo_comments (1).csv")
-    # ).sample(0.01, seed=441)
-
-    # submissions_df = (spark.read
-    #     .option("multiline", "true")
-    #     .option("quote", '"')
-    #     .option("header", "true")
-    #     .option("escape", "\\")
-    #     .option("escape", '"')
-    #     .csv("/content/drive/MyDrive/proj/uwaterloo_submissions (1).csv")
-    # ).sample(0.1, seed=441)
-
     print(f"num_comments, num_submissions: {comments_df.count()}, {submissions_df.count()}")
 
     submissions_subset = (submissions_df.withColumn("created_utc", from_unixtime("created_utc"))
@@ -149,19 +128,6 @@ def main():
         .select("created_utc", "author", col('body').alias("text"), "score", "link_id", "week")
     )
 
-    # submissions_subset = (submissions_df
-    #     .filter((year(col("created_utc")) >= 2013) & (year(col("created_utc")) < 2023))
-    #     .withColumn("text", concat_ws(' ', "selftext", "title"))
-    #     .withColumn('week', ceil(datediff('created_utc', lit(REF_DATE))/7))
-    #     .select("created_utc", "author", "text", "score", col('id').alias("link_id"), "week")
-    # )
-
-    # submissions_title = (submissions_df
-    #     .filter((year(col("created_utc")) >= 2013) & (year(col("created_utc")) < 2023))
-    #     .withColumn('week', ceil(datediff('created_utc', lit(REF_DATE))/7))
-    #     .select("created_utc", "author", "title", "score", col('id').alias("title_link_id"), "week")
-    # )
-
     print(f"subset_comments, subset_submissions: {comments_subset.count()}, {submissions_subset.count()}")
 
     df_concat = comments_subset.union(submissions_subset)
@@ -176,10 +142,8 @@ def main():
 
     pipeline = Pipeline(stages=[tokenizer, remover])
 
-    # Fit the pipeline to the data
     model = pipeline.fit(df_concat)
 
-    # Transform the data
     processed_data = model.transform(df_concat)
 
     aggregated_processed_data = (processed_data
@@ -245,7 +209,6 @@ def main():
 
     outlier_terms = decomposed_rdd.collect()
 
-    ######
     decomposed_rdd_data = []
 
     decomposed_rdd_schema = StructType([
@@ -307,7 +270,6 @@ def main():
             ) \
         .filter(size('term_ids_contained') > 0)
 
-    # 1911 rows, with test sample sizes, 1932 exploded
     result_df = terms_contained_in_each_document \
         .select(
             'link_id',
@@ -337,10 +299,6 @@ def main():
 
 
     print(f"RDD Num partitions: {result_df.rdd.getNumPartitions()}")
-
-    # result_df = result_df.coalesce(NUM_PARTITIONS)
-
-    # print(f"RDD Num partitions after coalesce: {result_df.rdd.getNumPartitions()}")
 
     result_df.write.parquet(f"{args.s3_result_path}/{CURRENT_TIMESTAMP}/final_results")  
 
