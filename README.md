@@ -1,5 +1,5 @@
 # reddits-project
-An analysis of trending keywords on /r/uwaterloo
+An analysis of trending keywords on /r/uwaterloo over the past 10 years
 
 The project is structured as follows: 
 
