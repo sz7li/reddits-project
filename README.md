@@ -3,5 +3,4 @@ An analysis of trending keywords on /r/uwaterloo
 
 The project is structured as follows: 
 
-
-![Diagram](https://github.com/sz7li/reddits-project/assets/59582433/75aa30e2-ecf0-4181-b8cc-a4c46472b7be)
+![Python function (1)](https://github.com/sz7li/reddits-project/assets/59582433/29f08cae-c547-46e2-a766-5f09ed931c68)
