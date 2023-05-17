@@ -3,7 +3,7 @@ An analysis of trending keywords on /r/uwaterloo over the past 10 years
 
 The project is structured as follows: 
 
-![Python function (1)](https://github.com/sz7li/reddits-project/assets/59582433/29f08cae-c547-46e2-a766-5f09ed931c68)
+![Python function](https://github.com/sz7li/reddits-project/assets/59582433/d11d77b5-a718-4c05-ba5f-7fcae5457e45)
 
 The [final dashboard](https://public.tableau.com/app/profile/shao.zhong.li/viz/Book1_16835009348650/Dashboard1?publish=yes) can be found on Tableau Public.
 
